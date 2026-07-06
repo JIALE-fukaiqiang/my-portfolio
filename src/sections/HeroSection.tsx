@@ -8,6 +8,14 @@ const navLinks = [
   { label: 'Posters', href: '#posters' },
 ]
 
+const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  e.preventDefault()
+  const target = document.querySelector(href)
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
 export default function HeroSection() {
   return (
     <section
@@ -20,6 +28,7 @@ export default function HeroSection() {
             <a
               key={link.label}
               href={link.href}
+              onClick={(e) => handleNavClick(e, link.href)}
               className="text-[#D7E2EA] font-medium uppercase tracking-wider text-sm md:text-lg lg:text-[1.4rem] transition-opacity duration-200 hover:opacity-70"
             >
               {link.label}
