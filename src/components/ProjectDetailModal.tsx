@@ -10,12 +10,9 @@ interface ProjectDetail {
   creativeExplanation?: string
   responsibilities?: string
   image?: string
-  pdf?: string
   media: {
-    type: 'image' | 'video'
     src: string
     alt?: string
-    poster?: string
   }
 }
 
@@ -49,9 +46,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
   if (!isOpen || !project) return null
 
-  const coverSrc =
-    project.image ||
-    (project.media.type === 'image' ? project.media.src : project.media.poster)
+  const coverSrc = project.image || project.media.src
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -130,19 +125,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
               >
                 {project.responsibilities}
               </p>
-            </div>
-          )}
-
-          {project.pdf && (
-            <div className="pt-4">
-              <a
-                href={project.pdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-10 py-4 text-sm sm:text-base font-medium uppercase tracking-widest text-[#0C0C0C] bg-[#D7E2EA] rounded-full transition-transform hover:scale-105"
-              >
-                查看完整策划案 PDF
-              </a>
             </div>
           )}
         </div>

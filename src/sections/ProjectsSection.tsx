@@ -1,16 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Play, Pause } from 'lucide-react'
 import FadeIn from '../components/FadeIn'
 import StarField from '../components/StarField'
 import ProjectDetailModal from '../components/ProjectDetailModal'
-
-interface ProjectMedia {
-  type: 'image' | 'video'
-  src: string
-  alt?: string
-  poster?: string
-}
 
 interface Project {
   id: number
@@ -21,8 +13,10 @@ interface Project {
   creativeExplanation?: string
   responsibilities?: string
   image?: string
-  pdf?: string
-  media: ProjectMedia
+  media: {
+    src: string
+    alt?: string
+  }
 }
 
 const projects: Project[] = [
@@ -38,7 +32,6 @@ const projects: Project[] = [
     responsibilities:
       '独立统筹账号全链路运营，包括选题策划、文案脚本撰写、视频剪辑制作、平台发布、数据运维及粉丝互动。使用剪映 + AI 生成素材与配音，建立 3 套模板化流程，保持每 5 天一更的稳定产出。',
     media: {
-      type: 'image',
       src: '/images/delta-xiaohongshu-cover.jpg',
       alt: 'Delta攻略铺小红书账号',
     },
@@ -56,9 +49,8 @@ const projects: Project[] = [
       '担任视频项目负责人，负责选题构思、分镜脚本撰写、视频拍摄与剪辑制作。与团队成员协作完成策划方案，根据指导老师反馈多次打磨优化，最终输出高质量参赛作品。',
     image: '/images/sheng-sai-cover-new.png',
     media: {
-      type: 'video',
-      src: '/videos/省赛获奖.mp4',
-      poster: '/images/sheng-sai-cover-new.png',
+      src: '/images/sheng-sai-cover-new.png',
+      alt: '广东省职业院校技能大赛作品',
     },
   },
   {
@@ -73,9 +65,8 @@ const projects: Project[] = [
     responsibilities:
       '作为独立创作者，完成从创意概念、脚本撰写、拍摄剪辑到成片输出的全流程。按赛事要求输出成片与创作说明，最终获得短视频类优秀奖。',
     media: {
-      type: 'video',
-      src: '/videos/学院奖.mp4',
-      poster: '/images/xueyuanjiang-cover-new.png',
+      src: '/images/xueyuanjiang-cover-new.png',
+      alt: '学院奖短视频作品',
     },
   },
   {
@@ -90,9 +81,7 @@ const projects: Project[] = [
     responsibilities:
       '负责创意内容撰写、系列海报创意与延展、全链路推广传播方案（预热/爆发/余热多平台策略），以及所有平面物料的排版与规范统一。确保脚本画面、视觉符号与传播节奏高度协同，输出可执行的设计需求单和排期表，保障活动视觉调性与传播效果一致。',
     image: '/images/rio-cover.jpg',
-    pdf: '/RIO.pdf',
     media: {
-      type: 'image',
       src: '/images/rio-cover.jpg',
       alt: '《强爽·酒鬼地图》RIO 营销策划全案',
     },
@@ -109,9 +98,7 @@ const projects: Project[] = [
     responsibilities:
       '负责品牌洞察分析、创意概念发想、广告文案撰写、视觉创意延展及参赛作品整合。按照学院奖赛事要求输出完整的策划方案与作品物料，确保创意表达与品牌调性一致。',
     image: '/images/wahaha-cover-new.jpg',
-    pdf: '/wahaha.pdf',
     media: {
-      type: 'image',
       src: '/images/wahaha-cover-new.jpg',
       alt: '《哇哈哈》大学生广告艺术大赛作品',
     },
@@ -128,125 +115,12 @@ const projects: Project[] = [
     responsibilities:
       '独立完成市场调研、品牌分析、传播策略制定、创意内容策划及执行排期。输出策划全案文档，包括目标设定、渠道规划、内容矩阵、预算分配与效果评估，确保方案的系统性与可执行性。',
     image: '/images/yayale-cover-new.jpg',
-    pdf: '/yayale.pdf',
     media: {
-      type: 'image',
       src: '/images/yayale-cover-new.jpg',
       alt: '《伢牙乐》品牌营销策划案',
     },
   },
 ]
-
-function ProjectImage({ src, alt }: { src: string; alt?: string }) {
-  return (
-    <img
-      src={src}
-      alt={alt}
-      className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover"
-      loading="lazy"
-    />
-  )
-}
-
-function VideoPlayer({ src, poster }: { src: string; poster?: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isVisible, setIsVisible] = useState(false)
-  const [hasInteracted, setHasInteracted] = useState(false)
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting)
-      },
-      { threshold: 0.4 }
-    )
-
-    observer.observe(video)
-
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (hasInteracted && isVisible) {
-      video.play().catch(() => setIsPlaying(false))
-    } else {
-      video.pause()
-    }
-  }, [hasInteracted, isVisible])
-
-  const togglePlay = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (video.paused) {
-      video.play().catch(() => {})
-      setIsPlaying(true)
-      setHasInteracted(true)
-    } else {
-      video.pause()
-      setIsPlaying(false)
-    }
-  }
-
-  return (
-    <div className="relative w-full h-full group">
-      <video
-        ref={videoRef}
-        src={src}
-        poster={poster}
-        loop
-        muted
-        playsInline
-        preload="metadata"
-        className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover"
-        onClick={togglePlay}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-      >
-        您的浏览器不支持视频播放。
-      </video>
-
-      <button
-        onClick={togglePlay}
-        className="absolute inset-0 flex items-center justify-center rounded-[40px] sm:rounded-[50px] md:rounded-[60px] transition-colors duration-300 hover:bg-black/30 focus:outline-none"
-        aria-label={isPlaying ? '暂停视频' : '播放视频'}
-      >
-        <div
-          className={`
-            w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/90 flex items-center justify-center
-            shadow-lg backdrop-blur-sm transition-all duration-300
-            ${isPlaying ? 'opacity-0 group-hover:opacity-100 scale-90' : 'opacity-100 scale-100'}
-          `}
-        >
-          {isPlaying ? (
-            <Pause className="w-6 h-6 sm:w-8 sm:h-8 text-[#0C0C0C]" />
-          ) : (
-            <Play className="w-6 h-6 sm:w-8 sm:h-8 text-[#0C0C0C] ml-1" />
-          )}
-        </div>
-      </button>
-    </div>
-  )
-}
-
-function ProjectMedia({ media }: { media: Project['media'] }) {
-  if (media.type === 'image') {
-    return <ProjectImage src={media.src} alt={media.alt} />
-  }
-
-  if (media.type === 'video') {
-    return <VideoPlayer src={media.src} poster={media.poster} />
-  }
-
-  return null
-}
 
 function ProjectCard({
   project,
@@ -269,7 +143,6 @@ function ProjectCard({
 
   const scale = useTransform(scrollYProgress, [0, 1], [1, targetScale])
 
-  // 响应式 sticky 偏移：小屏稀疏一些，避免内容被过度遮挡
   const baseTop = 80
   const offset = index * 24
 
@@ -317,7 +190,12 @@ function ProjectCard({
         </p>
 
         <div className="flex-1 min-h-0 mb-4 sm:mb-6">
-          <ProjectMedia media={project.media} />
+          <img
+            src={project.media.src}
+            alt={project.media.alt}
+            className="w-full h-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] object-cover"
+            loading="lazy"
+          />
         </div>
 
         <div className="flex justify-end">
